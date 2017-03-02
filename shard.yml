@@ -1,0 +1,9 @@
+name: cr-uvarint
+version: 0.1.0
+
+authors:
+  - Brandon Freitag <freitagbr@gmail.com>
+
+crystal: 0.21.0
+
+license: MIT

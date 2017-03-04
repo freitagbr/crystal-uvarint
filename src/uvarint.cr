@@ -18,9 +18,18 @@ struct UVarInt
     @decoded = decode bytes
   end
 
-  def initialize(en : Indexable(UInt8))
+  def initialize(en : Enumerable(UInt8))
     raise ArgumentError.new "cannot initialize with more than 10 bytes" if en.size > 10
-    bytes = Bytes.new(en.size) { |i| en[i] }
+    arr = en.to_a
+    bytes = Bytes.new(arr.to_unsafe, arr.size)
+    @encoded = bytes
+    @decoded = decode bytes
+  end
+
+  def initialize(str : String)
+    raise ArgumentError.new "cannot initialize with more than 10 bytes" if str.size > 10
+    arr = str.bytes
+    bytes = Bytes.new(arr.to_unsafe, arr.size)
     @encoded = bytes
     @decoded = decode bytes
   end

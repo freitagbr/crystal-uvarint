@@ -76,6 +76,19 @@ describe UVarInt do
     end
   end
 
+  describe "[] macro" do
+    it "throws if more than 10 bytes are passed" do
+      ex = expect_raises(ArgumentError) { UVarInt[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
+      ex.message.should eq("cannot initialize with more than 10 bytes")
+    end
+
+    it "instantiates a UVarInt with the passed bytes" do
+      v = UVarInt[172, 2]
+      b = v.bytes
+      b.should eq(Bytes[172, 2])
+    end
+  end
+
   describe "decode" do
     it "decodes single bytes" do
       n = Random.rand(0..0x7F).to_u8
@@ -119,6 +132,22 @@ describe UVarInt do
       v = UVarInt.new 0x0F00_u64
       b = v.bytes
       b.should eq(Bytes[0x80_u8, 0x1E_u8])
+    end
+  end
+
+  describe "to_s" do
+    it "returns self.uint.to_s" do
+      v = UVarInt.new 300_u64
+      s = v.to_s 16
+      s.should eq("12c")
+    end
+  end
+
+  describe "hexstring" do
+    it "returns self.bytes.hexstring" do
+      v = UVarInt.new 300_u64
+      h = v.hexstring
+      h.should eq("ac02")
     end
   end
 

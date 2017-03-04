@@ -16,12 +16,13 @@ struct UVarInt
   end
 
   def initialize(bytes : Bytes)
+    raise ArgumentError.new "cannot initialize with more than 10 bytes" if bytes.size > 10
     @encoded = bytes
     @decoded = decode bytes
   end
 
-  def initialize(en : Enumerable(UInt8))
-    raise Exception.new "overflow" if en.size >= 10
+  def initialize(en : Indexable(UInt8))
+    raise ArgumentError.new "cannot initialize with more than 10 bytes" if en.size > 10
     bytes = Bytes.new(en.size) { |i| en[i] }
     @encoded = bytes
     @decoded = decode bytes

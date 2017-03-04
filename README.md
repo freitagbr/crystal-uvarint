@@ -46,4 +46,5 @@ Create an issue or submit a PR. Be sure to add tests if need be.
 
 ## Contributors
 
-- [freitagbr](https://github.com/freitagbr) Brandon Freitag - creator, maintainer
+- [freitagbr](https://github.com/freitagbr) Brandon Freitag - maintainer
+- [nfischer](https://github.com/nfischer) Nate Fischer - maintainer

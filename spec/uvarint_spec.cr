@@ -1,12 +1,12 @@
 require "spec"
 require "../src/uvarint"
 
-describe UVarint do
+describe UVarInt do
   it "encodes and decodes random values" do
     (0..100000).each do
       n = Random.rand(0..0x7FFFFFFF).to_u64
-      e = UVarint.encode n
-      d = UVarint.decode e
+      v = UVarInt.new n
+      d = v.decoded
       d.should eq(n)
     end
   end
@@ -14,38 +14,43 @@ describe UVarint do
   it "decodes single bytes" do
     n = Random.rand(0..0x7F).to_u8
     buf = [n]
-    d = UVarint.decode buf
+    v = UVarInt.new buf
+    d = v.decoded
     d.should eq(n)
   end
 
   it "decodes multiple bytes" do
     buf = [0xAC_u8, 0x02_u8]
-    d = UVarint.decode buf
+    v = UVarInt.new buf
+    d = v.decoded
     d.should eq(300)
   end
 
   it "decodes multiple bytes with zero" do
     n = Random.rand(0x7F).to_u8
     buf = [0x80_u8, n]
-    d = UVarint.decode buf
+    v = UVarInt.new buf
+    d = v.decoded
     d.should eq(n.to_u64 << 7)
   end
 
   it "encodes to single bytes" do
     n = Random.rand(0x7F).to_u64
-    e = UVarint.encode n
-    e.should eq([n.to_u8])
+    v = UVarInt.new n
+    e = v.encoded
+    e.should eq(Bytes[n.to_u8])
   end
 
   it "encodes to multiple bytes" do
-    e = UVarint.encode 300_u64
-    e.should eq([0xAC_u8, 0x02_u8])
+    v = UVarInt.new 300_u64
+    e = v.encoded
+    e.should eq(Bytes[0xAC_u8, 0x02_u8])
   end
 
   it "encodes to multiple bytes with first byte zero" do
-    n = 0x0F00_u64
-    e = UVarint.encode n
-    e.should eq([0x80_u8, 0x1E_u8])
+    v = UVarInt.new 0x0F00_u64
+    e = v.encoded
+    e.should eq(Bytes[0x80_u8, 0x1E_u8])
   end
 
   it "encodes and decodes big integers" do
@@ -57,8 +62,8 @@ describe UVarint do
     end
 
     bigs.each do |n|
-      e = UVarint.encode n
-      d = UVarint.decode e
+      v = UVarInt.new n
+      d = v.decoded
       d.should eq(n)
     end
   end
@@ -69,8 +74,8 @@ describe UVarint do
       upper = Random.rand(max_u32).to_u64 << 32
       lower = Random.rand(max_u32).to_u64
       n = upper + lower
-      e = UVarint.encode n
-      d = UVarint.decode e
+      v = UVarInt.new n
+      d = v.decoded
       d.should eq(n)
     end
   end

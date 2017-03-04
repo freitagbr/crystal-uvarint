@@ -36,49 +36,49 @@ private def decode(bytes : Bytes) : UInt64
 end
 
 struct UVarInt
-  @encoded : Bytes
-  @decoded : UInt64
+  @bytes : Bytes
+  @uint : UInt64
 
   def initialize(uint : Int::Unsigned)
-    @decoded = uint.to_u64
-    @encoded = encode uint
+    @uint = uint.to_u64
+    @bytes = encode uint
   end
 
   def initialize(bytes : Bytes)
     raise ArgumentError.new "cannot initialize with more than 10 bytes" if bytes.size > 10
-    @encoded = bytes
-    @decoded = decode bytes
+    @bytes = bytes
+    @uint = decode bytes
   end
 
   def initialize(en : Enumerable(UInt8))
     raise ArgumentError.new "cannot initialize with more than 10 bytes" if en.size > 10
     arr = en.to_a
     bytes = Bytes.new(arr.to_unsafe, arr.size)
-    @encoded = bytes
-    @decoded = decode bytes
+    @bytes = bytes
+    @uint = decode bytes
   end
 
   def initialize(str : String)
     raise ArgumentError.new "cannot initialize with more than 10 bytes" if str.size > 10
     arr = str.bytes
     bytes = Bytes.new(arr.to_unsafe, arr.size)
-    @encoded = bytes
-    @decoded = decode bytes
+    @bytes = bytes
+    @uint = decode bytes
   end
 
   # Accessors
-  def encoded
-    @encoded
+  def bytes
+    @bytes
   end
 
-  def decoded
-    @decoded
+  def uint
+    @uint
   end
 
   {% begin %}
     {% for opt in %w(% * ** + - / << <=> === >>) %}
       def {{opt.id}}(other : UVarInt) : UInt64
-        @decoded {{opt.id}} other.decoded
+        @uint {{opt.id}} other.uint
       end
     {% end %}
 
@@ -90,7 +90,7 @@ struct UVarInt
     } %}
       # Returns *self* converted to {{type}}.
       def {{name.id}} : {{type}}
-        @decoded.{{name.id}}
+        @uint.{{name.id}}
       end
     {% end %}
   {% end %}

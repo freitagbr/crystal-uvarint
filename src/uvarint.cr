@@ -75,6 +75,23 @@ struct UVarInt
     @uint
   end
 
+  def to_s(base : Int32)
+    @uint.to_s base
+  end
+
+  def hexstring
+    @bytes.hexstring
+  end
+
+  macro [](*args)
+    {% if args.size > 10 %}
+      raise ArgumentError.new "cannot initialize with more than 10 bytes"
+    {% else %}
+      %bytes = Bytes[{{*args}}]
+      UVarInt.new %bytes
+    {% end %}
+  end
+
   {% begin %}
     {% for opt in %w(% * ** + - / << <=> === >>) %}
       def {{opt.id}}(other : UVarInt) : UInt64

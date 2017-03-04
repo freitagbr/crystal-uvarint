@@ -55,6 +55,20 @@ describe UVarInt do
       d.should eq(300)
     end
 
+    it "handles ranges" do
+      r = 0x00_u8..0x09_u8
+      v = UVarInt.new r
+      d = v.decoded
+      d.should eq(0)
+    end
+
+    it "handles strings" do
+      s = "abcd"
+      v = UVarInt.new s
+      d = v.decoded
+      d.should eq(97)
+    end
+
     it "raises an exception if passed more than 10 bytes" do
       b = Array.new(20, 0_u8)
       ex = expect_raises(ArgumentError) { UVarInt.new b }

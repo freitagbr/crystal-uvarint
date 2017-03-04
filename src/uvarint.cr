@@ -10,9 +10,9 @@ struct UVarInt
   @encoded : Bytes
   @decoded : UInt64
 
-  def initialize(int : Int::Unsigned)
-    @decoded = int.to_u64
-    @encoded = encode @decoded
+  def initialize(uint : Int::Unsigned)
+    @decoded = uint.to_u64
+    @encoded = encode uint
   end
 
   def initialize(bytes : Bytes)
@@ -36,9 +36,8 @@ struct UVarInt
     @decoded
   end
 
-  # encode encodes a UInt64 into a UVarInt,
-  # which is an Array of UInt8's.
-  private def encode(n : UInt64) : Bytes
+  # Encodes an Int::Unsined into a Bytes slice.
+  private def encode(n : Int::Unsigned) : Bytes
     ptr = Pointer(UInt8).malloc 10
     i = 0
     while n >= MSB
@@ -50,7 +49,7 @@ struct UVarInt
     Bytes.new(ptr, i + 1)
   end
 
-  # decode decodes enumerable bytes into a UInt64.
+  # Decodes enumerable bytes into a UInt64.
   # If the enumeration is longer thar 10 bytes,
   # then an overflow exception is raised.
   private def decode(bytes : Bytes) : UInt64

@@ -94,8 +94,8 @@ struct UVarInt
 
   {% begin %}
     {% for opt in %w(% * ** + - / << <=> === >>) %}
-      def {{opt.id}}(other : UVarInt) : UInt64
-        @uint {{opt.id}} other.uint
+      def {{opt.id}}(other : UVarInt) : UVarInt
+        UVarInt.new(@uint {{opt.id}} other.uint)
       end
     {% end %}
 

@@ -74,4 +74,24 @@ struct UVarInt
   def decoded
     @decoded
   end
+
+  {% begin %}
+    {% for opt in %w(% * ** + - / << <=> === >>) %}
+      def {{opt.id}}(other : UVarInt) : UInt64
+        @decoded {{opt.id}} other.decoded
+      end
+    {% end %}
+
+    {% for name, type in {
+        to_i: Int32, to_u: UInt32, to_f: Float64,
+        to_i8: Int8, to_i16: Int16, to_i32: Int32, to_i64: Int64,
+        to_u8: UInt8, to_u16: UInt16, to_u32: UInt32, to_u64: UInt64,
+        to_f32: Float32, to_f64: Float64,
+    } %}
+      # Returns *self* converted to {{type}}.
+      def {{name.id}} : {{type}}
+        @decoded.{{name.id}}
+      end
+    {% end %}
+  {% end %}
 end

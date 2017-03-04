@@ -3,9 +3,6 @@ require "./uvarint/*"
 # This module is based on the varint implementation in the Go programming
 # language. See: https://golang.org/src/encoding/binary/varint.go
 
-MSB = 0x80_u8  # 10000000
-REST = 0x7F_u8 # 01111111
-
 struct UVarInt
   @encoded : Bytes
   @decoded : UInt64
@@ -41,8 +38,8 @@ struct UVarInt
   private def encode(n : Int::Unsigned) : Bytes
     ptr = Pointer(UInt8).malloc 10
     i = 0
-    while n >= MSB
-      ptr[i] = n.to_u8 | MSB
+    while n >= 0x80_u8
+      ptr[i] = n.to_u8 | 0x80_u8
       i += 1
       n = n >> 7
     end
@@ -57,13 +54,13 @@ struct UVarInt
     x = 0_u64
     s = 0
     bytes.each_with_index do |b, i|
-      if b < MSB
+      if b < 0x80_u8
         if i > 9 || i == 9 && b > 1
-          raise Exception.new("overflow")
+          raise Exception.new "overflow"
         end
         return x | (b.to_u64 << s)
       end
-      x |= (b & REST).to_u64 << s
+      x |= (b & 0x7F_u8).to_u64 << s
       s += 7
     end
     0_u64

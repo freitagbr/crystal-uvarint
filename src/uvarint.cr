@@ -1,46 +1,48 @@
+require "big/big_int"
+
 require "./uvarint/*"
 
 # This module is based on the varint implementation in the Go programming
 # language. See: https://golang.org/src/encoding/binary/varint.go
 
+private MSB = 0x80_u8
+private REST = 0x7F_u8
+private ZERO = 0.to_big_i
+
 # Encodes an Int::Unsined into a Bytes slice.
-private def encode(n : Int::Unsigned) : Bytes
-  ptr = Pointer(UInt8).malloc 10
-  i = 0
-  while n >= 0x80_u8
-    ptr[i] = n.to_u8 | 0x80_u8
-    i += 1
+private def encode(n : Int::Unsigned | BigInt) : Bytes
+  arr = [] of UInt8
+  while n >= MSB
+    arr << (n.to_u8 | MSB)
     n = n >> 7
   end
-  ptr[i] = n.to_u8
-  Bytes.new(ptr, i + 1)
+  arr << n.to_u8
+  ptr = arr.to_unsafe
+  Bytes.new(ptr, arr.size)
 end
 
-# Decodes enumerable bytes into a UInt64.
+# Decodes enumerable bytes into a BigInt.
 # If the enumeration is longer thar 10 bytes,
 # then an overflow exception is raised.
-private def decode(bytes : Bytes) : UInt64
-  x = 0_u64
+private def decode(bytes : Bytes) : BigInt
+  x = ZERO
   s = 0
   bytes.each_with_index do |b, i|
-    if b < 0x80_u8
-      if i > 9 || i == 9 && b > 1
-        raise Exception.new "overflow"
-      end
-      return x | (b.to_u64 << s)
+    if b < MSB
+      return x | (b.to_big_i << s)
     end
-    x |= (b & 0x7F_u8).to_u64 << s
+    x = x | ((b & REST).to_big_i << s)
     s += 7
   end
-  0_u64
+  ZERO
 end
 
 struct UVarInt
   @bytes : Bytes
-  @uint : UInt64
+  @uint : BigInt
 
   def initialize(uint : Int::Unsigned)
-    @uint = uint.to_u64
+    @uint = uint.to_big_i
     @bytes = encode uint
   end
 

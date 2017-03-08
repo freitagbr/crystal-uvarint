@@ -1,4 +1,6 @@
+require "big/big_int"
 require "spec"
+
 require "../src/uvarint"
 
 describe UVarInt do
@@ -25,6 +27,12 @@ describe UVarInt do
       v = UVarInt.new 5000000000_u64
       b = v.bytes
       b.should eq(Bytes[128, 228, 151, 208, 18])
+    end
+
+    it "handles bigints" do
+      v = UVarInt.new(BigInt.new "9999999999999999999999999999999999")
+      b = v.bytes
+      b.should eq(Bytes[255, 255, 255, 255, 191, 204, 227, 198, 183, 128, 159, 236, 234, 183, 194, 246, 1])
     end
 
     it "handles arrays" do
@@ -68,20 +76,9 @@ describe UVarInt do
       u = v.uint
       u.should eq(97)
     end
-
-    it "raises an exception if passed more than 10 bytes" do
-      b = Array.new(20, 0_u8)
-      ex = expect_raises(ArgumentError) { UVarInt.new b }
-      ex.message.should eq("cannot initialize with more than 10 bytes")
-    end
   end
 
   describe "[] macro" do
-    it "throws if more than 10 bytes are passed" do
-      ex = expect_raises(ArgumentError) { UVarInt[0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] }
-      ex.message.should eq("cannot initialize with more than 10 bytes")
-    end
-
     it "instantiates a UVarInt with the passed bytes" do
       v = UVarInt[172, 2]
       b = v.bytes
@@ -161,7 +158,7 @@ describe UVarInt do
       end
     end
 
-    it "encodes and decodes big integers" do
+    it "encodes and decodes uint64 values" do
       bigs = [] of UInt64
       (32..53).each do |i|
         n = (2 ** i).to_u64
@@ -176,7 +173,7 @@ describe UVarInt do
       end
     end
 
-    it "encodes and decodes really big integers" do
+    it "encodes and decodes large uint64 values" do
       max_u32 = 0_u32..0xFFFFFFFF_u32
       (0..100000).each do
         upper = Random.rand(max_u32).to_u64 << 32

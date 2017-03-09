@@ -88,12 +88,8 @@ struct UVarInt
   end
 
   macro [](*args)
-    {% if args.size > 10 %}
-      raise ArgumentError.new "cannot initialize with more than 10 bytes"
-    {% else %}
-      %bytes = Bytes[{{*args}}]
-      UVarInt.new %bytes
-    {% end %}
+    %bytes = Bytes[{{*args}}]
+    UVarInt.new %bytes
   end
 
   {% begin %}

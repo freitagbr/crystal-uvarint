@@ -38,43 +38,43 @@ describe UVarInt do
     it "handles arrays" do
       a = [0xAC_u8, 0x02_u8]
       v = UVarInt.new a
-      u = v.uint
-      u.should eq(300)
+      i = v.to_big_i
+      i.should eq(300)
     end
 
     it "handles deques" do
       d = Deque{0xAC_u8, 0x02_u8}
       v = UVarInt.new d
-      u = v.uint
-      u.should eq(300)
+      i = v.to_big_i
+      i.should eq(300)
     end
 
     it "handles static arrays" do
       s = StaticArray[0xAC_u8, 0x02_u8]
       v = UVarInt.new s
-      u = v.uint
-      u.should eq(300)
+      i = v.to_big_i
+      i.should eq(300)
     end
 
     it "handles tuples" do
       t = {0xAC_u8, 0x02_u8}
       v = UVarInt.new t
-      u = v.uint
-      u.should eq(300)
+      i = v.to_big_i
+      i.should eq(300)
     end
 
     it "handles ranges" do
       r = 0x00_u8..0x09_u8
       v = UVarInt.new r
-      u = v.uint
-      u.should eq(0)
+      i = v.to_big_i
+      i.should eq(0)
     end
 
     it "handles strings" do
       s = "abcd"
       v = UVarInt.new s
-      u = v.uint
-      u.should eq(97)
+      i = v.to_big_i
+      i.should eq(97)
     end
   end
 
@@ -91,23 +91,23 @@ describe UVarInt do
       n = Random.rand(0..0x7F).to_u8
       b = Bytes[n]
       v = UVarInt.new b
-      u = v.uint
-      u.should eq(n)
+      i = v.to_big_i
+      i.should eq(n)
     end
 
     it "decodes multiple bytes" do
       b = Bytes[0xAC_u8, 0x02_u8]
       v = UVarInt.new b
-      u = v.uint
-      u.should eq(300)
+      i = v.to_big_i
+      i.should eq(300)
     end
 
     it "decodes multiple bytes with zero" do
       n = Random.rand(0x7F).to_u8
       b = Bytes[0x80_u8, n]
       v = UVarInt.new b
-      u = v.uint
-      u.should eq(n.to_u64 << 7)
+      i = v.to_big_i
+      i.should eq(n.to_u64 << 7)
     end
   end
 
@@ -133,7 +133,7 @@ describe UVarInt do
   end
 
   describe "to_s" do
-    it "returns self.uint.to_s" do
+    it "returns self.bigint.to_s" do
       v = UVarInt.new 300_u64
       s = v.to_s 16
       s.should eq("12c")
@@ -153,8 +153,8 @@ describe UVarInt do
       (0..100000).each do
         n = Random.rand(0..0x7FFFFFFF).to_u64
         v = UVarInt.new n
-        u = v.uint
-        u.should eq(n)
+        i = v.to_big_i
+        i.should eq(n)
       end
     end
 
@@ -168,8 +168,8 @@ describe UVarInt do
 
       bigs.each do |n|
         v = UVarInt.new n
-        u = v.uint
-        u.should eq(n)
+        i = v.to_big_i
+        i.should eq(n)
       end
     end
 
@@ -180,8 +180,8 @@ describe UVarInt do
         lower = Random.rand(max_u32).to_u64
         n = upper + lower
         v = UVarInt.new n
-        u = v.uint
-        u.should eq(n)
+        i = v.to_big_i
+        i.should eq(n)
       end
     end
   end

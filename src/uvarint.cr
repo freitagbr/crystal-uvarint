@@ -39,48 +39,48 @@ end
 
 struct UVarInt
   @bytes : Bytes
-  @uint : BigInt
+  @bigint : BigInt
 
-  def initialize(uint : Int::Unsigned)
-    @uint = uint.to_big_i
-    @bytes = encode uint
+  def initialize(int : Int::Unsigned)
+    @bigint = int.to_big_i
+    @bytes = encode int
   end
 
-  def initialize(uint : BigInt)
-    @uint = uint.to_big_i
-    @bytes = encode uint
+  def initialize(int : BigInt)
+    @bigint = int.to_big_i
+    @bytes = encode int
   end
 
   def initialize(bytes : Bytes)
     @bytes = bytes
-    @uint = decode bytes
+    @bigint = decode bytes
   end
 
   def initialize(en : Enumerable(UInt8))
     arr = en.to_a
     bytes = Bytes.new(arr.to_unsafe, arr.size)
     @bytes = bytes
-    @uint = decode bytes
+    @bigint = decode bytes
   end
 
   def initialize(str : String)
     arr = str.bytes
     bytes = Bytes.new(arr.to_unsafe, arr.size)
     @bytes = bytes
-    @uint = decode bytes
+    @bigint = decode bytes
   end
 
-  # Accessors
+  # Accessor
   def bytes
     @bytes
   end
 
-  def uint
-    @uint
+  def to_big_i
+    @bigint
   end
 
   def to_s(base : Int32)
-    @uint.to_s base
+    @bigint.to_s base
   end
 
   def hexstring
@@ -93,12 +93,20 @@ struct UVarInt
   end
 
   {% begin %}
-    {% for opt in %w(% * ** + - / << <=> === >>) %}
+
+    # for the following operators, define a method
+    # that performs that operation on both operads'
+    # int values, and returns a new UVarInt with
+    # the new value
+    {% for opt in %w(% & * ** + - / << <=> === >> ^) %}
       def {{opt.id}}(other : UVarInt) : UVarInt
-        UVarInt.new(@uint {{opt.id}} other.uint)
+        UVarInt.new(@bigint {{opt.id}} other.to_big_i)
       end
     {% end %}
 
+    # for the following name-type pairs, define a method
+    # that is mapped to the method of the same name on
+    # the internal BigInt value
     {% for name, type in {
         to_i:   Int32,   to_u:   UInt32,  to_f:   Float64,
         to_i8:  Int8,    to_i16: Int16,   to_i32: Int32,  to_i64: Int64,
@@ -107,7 +115,7 @@ struct UVarInt
     } %}
       # Returns *self* converted to {{type}}.
       def {{name.id}} : {{type}}
-        @uint.{{name.id}}
+        @bigint.{{name.id}}
       end
     {% end %}
   {% end %}

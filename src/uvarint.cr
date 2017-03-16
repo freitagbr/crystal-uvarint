@@ -64,10 +64,9 @@ struct UVarInt
   end
 
   def initialize(str : String)
-    arr = str.bytes
-    bytes = Bytes.new(arr.to_unsafe, arr.size)
-    @bytes = bytes
-    @bigint = decode bytes
+    int = str.to_u64 16
+    @bigint = int.to_big_i
+    @bytes = encode int
   end
 
   # Accessor

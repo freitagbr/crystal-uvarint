@@ -71,10 +71,10 @@ describe UVarInt do
     end
 
     it "handles strings" do
-      s = "abcd"
+      s = "34"
       v = UVarInt.new s
       i = v.to_big_i
-      i.should eq(97)
+      i.should eq(52)
     end
   end
 

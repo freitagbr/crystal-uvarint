@@ -185,4 +185,123 @@ describe UVarInt do
       end
     end
   end
+
+  describe "math operators" do
+    it "%" do
+      a = UVarInt.new 5_u8
+      b = UVarInt.new 2_u8
+      c = UVarInt.new 1_u8
+      (a % b).should eq(c)
+    end
+
+    it "&" do
+      a = UVarInt.new 4_u8
+      b = UVarInt.new 3_u8
+      c = UVarInt.new 0_u8
+      (a & b).should eq(c)
+    end
+
+    it "*" do
+      a = UVarInt.new 4_u8
+      b = UVarInt.new 5_u8
+      c = UVarInt.new 20_u8
+      (a * b).should eq(c)
+    end
+
+    it "**" do
+      a = UVarInt.new 2_u8
+      b = UVarInt.new 4_u8
+      c = UVarInt.new 16_u8
+      (a ** b).should eq(c)
+    end
+
+    it "+" do
+      a = UVarInt.new 2_u8
+      b = UVarInt.new 4_u8
+      c = UVarInt.new 6_u8
+      (a + b).should eq(c)
+    end
+
+    it "-" do
+      a = UVarInt.new 4_u8
+      b = UVarInt.new 3_u8
+      c = UVarInt.new 1_u8
+      (a - b).should eq(c)
+    end
+
+    it "/" do
+      a = UVarInt.new 8_u8
+      b = UVarInt.new 4_u8
+      c = UVarInt.new 2_u8
+      (a / b).should eq(c)
+    end
+
+    it "<<" do
+      a = UVarInt.new 2_u8
+      b = UVarInt.new 3_u8
+      c = UVarInt.new 16_u8
+      (a << b).should eq(c)
+    end
+
+    it ">>" do
+      a = UVarInt.new 16_u8
+      b = UVarInt.new 3_u8
+      c = UVarInt.new 2_u8
+      (a >> b).should eq(c)
+    end
+
+    it "^" do
+      a = UVarInt.new 4_u8
+      b = UVarInt.new 3_u8
+      c = UVarInt.new 7_u8
+      (a ^ b).should eq(c)
+    end
+  end
+
+  describe "logic operators" do
+    it "<" do
+      a = UVarInt.new 1_u8
+      b = UVarInt.new 2_u8
+      (a < b).should eq(true)
+      (b < a).should eq(false)
+    end
+
+    it "<=" do
+      a = UVarInt.new 1_u8
+      b = UVarInt.new 2_u8
+      (a <= a).should eq(true)
+      (a <= b).should eq(true)
+      (b <= a).should eq(false)
+    end
+
+    it "<=>" do
+      a = UVarInt.new 1_u8
+      b = UVarInt.new 2_u8
+      (a <=> b).should eq(-1)
+      (b <=> a).should eq(1)
+      (a <=> a).should eq(0)
+    end
+
+    it "==" do
+      a = UVarInt.new 1_u8
+      b = UVarInt.new 2_u8
+      (a == a).should eq(true)
+      (a == b).should eq(false)
+    end
+
+    it ">" do
+      a = UVarInt.new 1_u8
+      b = UVarInt.new 2_u8
+      (b > a).should eq(true)
+      (a > b).should eq(false)
+    end
+
+    it ">=" do
+      a = UVarInt.new 1_u8
+      b = UVarInt.new 2_u8
+      (a >= a).should eq(true)
+      (b >= a).should eq(true)
+      (a >= b).should eq(false)
+    end
+  end
 end

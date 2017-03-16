@@ -95,12 +95,22 @@ struct UVarInt
   {% begin %}
 
     # for the following operators, define a method
-    # that performs that operation on both operads'
-    # int values, and returns a new UVarInt with
-    # the new value
-    {% for opt in %w(% & * ** + - / << <=> === >> ^) %}
-      def {{opt.id}}(other : UVarInt) : UVarInt
-        UVarInt.new(@bigint {{opt.id}} other.to_big_i)
+    # that performs that mathematical operation on
+    # both operands' int values, and returns a new
+    # UVarInt with the new value
+    {% for op in %w(% & * ** + - / << >> ^) %}
+      def {{op.id}}(other : UVarInt) : UVarInt
+        UVarInt.new(@bigint {{op.id}} other.to_big_i)
+      end
+    {% end %}
+
+
+    # for the following operators, define a method
+    # that performs the logical operation on both
+    # operands' int values, and returns a boolean value
+    {% for op in %w(< <= <=> == > >=) %}
+      def {{op.id}}(other : UVarInt)
+        @bigint {{op.id}} other.to_big_i
       end
     {% end %}
 

@@ -82,8 +82,7 @@ struct UVarInt
   end
 
   def self.read(str : String)
-    # 0123456789abcdef => 01 23 45 67 89 ab cd ef
-    iter = str.each_char.in_groups_of(2).map { |e| e.join.to_u8(16) }
+    iter = str.each_byte
     bigint = read_decode iter
     UVarInt.new bigint
   end
@@ -95,6 +94,13 @@ struct UVarInt
   end
 
   def self.read(iter : Iterator(UInt8))
+    bigint = read_decode iter
+    UVarInt.new bigint
+  end
+
+  def self.parse(str : String)
+    # 0123456789abcdef => 01 23 45 67 89 ab cd ef
+    iter = str.each_char.in_groups_of(2).map { |e| e.join.to_u8(16) }
     bigint = read_decode iter
     UVarInt.new bigint
   end

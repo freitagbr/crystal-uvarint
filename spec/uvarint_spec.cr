@@ -80,38 +80,50 @@ describe UVarInt do
   end
 
   describe "read" do
-    # example multihash, the uvarint is only the first 4 characters.
+    # example multihash bytes, the uvarint is only the first 4 bytes.
     # UVarInt.read should stop after reading a complete, valid uvarint.
-    #           uvarint
-    #            vvvv
-    multihash = "b220207d0a1371550f3306532ff44520b649f8be05b72674e46fc24468ff74323ab030"
+    #              uvarint
+    #             vvvvvvvvvv
+    bytes = Bytes[0xb2, 0x20, 0x20, 0x7d, 0x0a, 0x13, 0x71, 0x55, 0x0f, 0x33, 0x06, 0x53, 0x2f,
+                  0xf4, 0x45, 0x20, 0xb6, 0x49, 0xf8, 0xbe, 0x05, 0xb7, 0x26, 0x74, 0xe4, 0x6f,
+                  0xc2, 0x44, 0x68, 0xff, 0x74, 0x32, 0x3a, 0xb0, 0x30]
 
     it "handles strings" do
-      v = UVarInt.read multihash
+      str = String.new bytes
+      v = UVarInt.read str
       h = v.hexstring
       h.should eq("b220")
     end
 
     it "handles io" do
-      # this is messy:
-      # treat every two characters as one byte, convert to an array,
-      # create a slice from that array,
-      # then create an io from that slice
-      a = multihash.each_char.in_groups_of(2).map { |e| e.join.to_u8(16) }.to_a
-      s = Slice.new(a.size) { |i| a[i] }
-      io = IO::Memory.new s
+      io = IO::Memory.new bytes
       v = UVarInt.read io
       h = v.hexstring
       h.should eq("b220")
     end
 
     it "handles byte iterators" do
-      i = multihash.each_char.in_groups_of(2).map { |e| e.join.to_u8(16) }
-      v = UVarInt.read i
+      iter = bytes.each
+      v = UVarInt.read iter
       h = v.hexstring
       h.should eq("b220")
     end
   end
+
+  describe "parse" do
+    # example multihash string, the uvarint is only the first 4 characters.
+    # UVarInt.parse should stop after reading a complete, valid uvarint.
+    #           uvarint
+    #            vvvv
+    multihash = "b220207d0a1371550f3306532ff44520b649f8be05b72674e46fc24468ff74323ab030"
+
+    it "parses a string" do
+      v = UVarInt.parse multihash
+      h = v.hexstring
+      h.should eq("b220")
+    end
+  end
+
 
   describe "[] macro" do
     it "instantiates a UVarInt with the passed bytes" do

@@ -9,7 +9,7 @@ private MSB = 0x80_u8
 private REST = 0x7F_u8
 private ZERO = 0.to_big_i
 
-# Encodes an Int::Unsined into a Bytes slice.
+# Encodes an Int::Unsigned into a Bytes slice.
 private def encode(n : Int::Unsigned | BigInt) : Bytes
   arr = [] of UInt8
   while n >= MSB
@@ -22,8 +22,6 @@ private def encode(n : Int::Unsigned | BigInt) : Bytes
 end
 
 # Decodes enumerable bytes into a BigInt.
-# If the enumeration is longer thar 10 bytes,
-# then an overflow exception is raised.
 private def decode(bytes : Bytes) : BigInt
   x = ZERO
   s = 0

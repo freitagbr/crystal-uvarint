@@ -21,11 +21,25 @@ private def encode(n : Int::Unsigned | BigInt) : Bytes
   Bytes.new(ptr, arr.size)
 end
 
-# Decodes enumerable bytes into a BigInt.
+# Decodes bytes into a BigInt.
 private def decode(bytes : Bytes) : BigInt
   x = ZERO
   s = 0
-  bytes.each_with_index do |b, i|
+  bytes.each do |b|
+    if b < MSB
+      return x | (b.to_big_i << s)
+    end
+    x = x | ((b & REST).to_big_i << s)
+    s += 7
+  end
+  ZERO
+end
+
+# Decodes iterable bytes into a BigInt.
+def read_decode(iter : Iterator(UInt8)) : BigInt
+  x = ZERO
+  s = 0
+  iter.each do |b|
     if b < MSB
       return x | (b.to_big_i << s)
     end
@@ -67,7 +81,24 @@ struct UVarInt
     @bytes = encode int
   end
 
-  # Accessor
+  def self.read(str : String)
+    # 0123456789abcdef => 01 23 45 67 89 ab cd ef
+    iter = str.each_char.in_groups_of(2).map { |e| e.join.to_u8(16) }
+    bigint = read_decode iter
+    UVarInt.new bigint
+  end
+
+  def self.read(io : IO)
+    iter = io.each_byte
+    bigint = read_decode iter
+    UVarInt.new bigint
+  end
+
+  def self.read(iter : Iterator(UInt8))
+    bigint = read_decode iter
+    UVarInt.new bigint
+  end
+
   def bytes
     @bytes
   end

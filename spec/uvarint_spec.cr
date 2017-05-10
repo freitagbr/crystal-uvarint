@@ -1,4 +1,5 @@
 require "big/big_int"
+require "io"
 require "spec"
 
 require "../src/uvarint"
@@ -75,6 +76,40 @@ describe UVarInt do
       v = UVarInt.new s
       i = v.to_big_i
       i.should eq(52)
+    end
+  end
+
+  describe "read" do
+    # example multihash, the uvarint is only the first 4 characters.
+    # UVarInt.read should stop after reading a complete, valid uvarint.
+    #           uvarint
+    #            vvvv
+    multihash = "b220207d0a1371550f3306532ff44520b649f8be05b72674e46fc24468ff74323ab030"
+
+    it "handles strings" do
+      v = UVarInt.read multihash
+      h = v.hexstring
+      h.should eq("b220")
+    end
+
+    it "handles io" do
+      # this is messy:
+      # treat every two characters as one byte, convert to an array,
+      # create a slice from that array,
+      # then create an io from that slice
+      a = multihash.each_char.in_groups_of(2).map { |e| e.join.to_u8(16) }.to_a
+      s = Slice.new(a.size) { |i| a[i] }
+      io = IO::Memory.new s
+      v = UVarInt.read io
+      h = v.hexstring
+      h.should eq("b220")
+    end
+
+    it "handles byte iterators" do
+      i = multihash.each_char.in_groups_of(2).map { |e| e.join.to_u8(16) }
+      v = UVarInt.read i
+      h = v.hexstring
+      h.should eq("b220")
     end
   end
 

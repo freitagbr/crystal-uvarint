@@ -45,7 +45,7 @@ struct UVarInt
   end
 
   def initialize(int : BigInt)
-    @bigint = int.to_big_i
+    @bigint = int
     @bytes = encode int
   end
 

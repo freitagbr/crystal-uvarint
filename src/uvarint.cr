@@ -36,7 +36,7 @@ private def decode(bytes : Bytes) : BigInt
 end
 
 # Decodes iterable bytes into a BigInt.
-def read_decode(iter : Iterator(UInt8)) : BigInt
+private def read_decode(iter : Iterator(UInt8)) : BigInt
   x = ZERO
   s = 0
   iter.each do |b|
